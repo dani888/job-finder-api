@@ -1,11 +1,11 @@
 CREATE TABLE job (
     ID UUID PRIMARY KEY,
-    title VARCHAR (50) NOT NULL,
-    seniority VARCHAR (50) NOT NULL,
-    url VARCHAR (200) NOT NULL,
-    posting_date TIMESTAMPTZ NOT NULL
+    title TEXT NOT NULL,
+    seniority TEXT NOT NULL,
+    url TEXT NOT NULL,
+    posting_date TIMESTAMPTZ NOT NULL,
+	CONSTRAINT duplicate_job UNIQUE (title,posting_date)
 );
-
 
 
 
