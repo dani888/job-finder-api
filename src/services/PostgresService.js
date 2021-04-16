@@ -30,13 +30,13 @@ class PostgresService {
         let valuePlaceholders,
             values = [],
             counter = 1;
-        jobs.map(({title,seniority,url,posting_date})=>{
-            valuePlaceholders = valuePlaceholders ? `${valuePlaceholders},($${counter++},$${counter++},$${counter++},$${counter++},$${counter++})` : `($${counter++},$${counter++},$${counter++},$${counter++},$${counter++})`;
-            values.push(uuid.v1(),title,seniority,posting_date,url)
+        jobs.map(({title,seniority,url, location, posting_date})=>{
+            valuePlaceholders = valuePlaceholders ? `${valuePlaceholders},($${counter++},$${counter++},$${counter++},$${counter++},$${counter++},$${counter++})` : `($${counter++},$${counter++},$${counter++},$${counter++},$${counter++},$${counter++})`;
+            values.push(uuid.v1(),title,seniority,posting_date,url, location)
         })
         const query = `
         INSERT INTO job
-            (ID, title, seniority, posting_date, url)
+            (ID, title, seniority, posting_date, url, location)
         VALUES 
             ${valuePlaceholders}
         ON CONFLICT DO NOTHING

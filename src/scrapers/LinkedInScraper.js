@@ -32,9 +32,10 @@ class LinkedInScraper {
         let jobs = []
         $('li.result-card.job-result-card').each(function (i, e) {
             jobs.push({
-                title:$(this).find('h3.result-card__title.job-result-card__title').text(),
+                title:$(this).find('h3.result-card__title.job-result-card__title').text(),    // result-card__title.job-result-card__title
                 url:$(this).find('a.result-card__full-card-link').attr('href'),
                 posting_date:$(this).find('time.job-result-card__listdate--new,time.job-result-card__listdate').attr('datetime'),
+                location:$(this).find('span.job-result-card__location').text(),
                 seniority:""//TODO
             })
         });
