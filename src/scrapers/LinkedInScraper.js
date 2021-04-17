@@ -12,33 +12,45 @@ class LinkedInScraper {
             paginationStep = 25,
             paginationQuery = '&start=',
             resultJobs = [];
-        let $ = await this.grabJobs(`${paginationUrl}${search}${paginationQuery}${pagination}`)
-        console.log($)
+        let $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
         while ($('li.result-card.job-result-card').length) {
             let newJobs = await this.parseJobs($)
             resultJobs = resultJobs.concat(newJobs)
-            console.log(newJobs)
             pagination += paginationStep
-            $ = await this.grabJobs(`${paginationUrl}${search}${paginationQuery}${pagination}`)
+            $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
         }
         return resultJobs
     }
-    async grabJobs(url){
-        let html = await axios.get(url);
-        const $ = cheerio.load(html.data);
+    async getUrl(url){
+        console.log(url);
+        let headers = {
+            'User-Agent':"Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36"
+        }
+        let response = await axios.get(url,headers)
+        const $ = cheerio.load(response.data);
         return $
     }
     async parseJobs($){
-        let jobs = []
-        $('li.result-card.job-result-card').each(function (i, e) {
-            jobs.push({
-                title:$(this).find('h3.result-card__title.job-result-card__title').text(),    // result-card__title.job-result-card__title
-                url:$(this).find('a.result-card__full-card-link').attr('href'),
-                posting_date:$(this).find('time.job-result-card__listdate--new,time.job-result-card__listdate').attr('datetime'),
-                location:$(this).find('span.job-result-card__location').text(),
-                seniority:""//TODO
-            })
-        });
+        let jobs = [],
+            _this = this,
+            timeout = 500;
+        await Promise.all($('li.result-card.job-result-card').map((i,e)=>{
+            return new Promise((resolve, reject) => {
+                async function processPage() {
+                    let url = $(e).find('a.result-card__full-card-link').attr('href'),
+                        jobPage = await _this.getUrl(url);
+                    jobs.push({
+                        title:$(e).find('h3.result-card__title.job-result-card__title').text(),
+                        url:url,
+                        location:$(this).find('span.job-result-card__location').text(),
+                        posting_date:$(e).find('time.job-result-card__listdate--new,time.job-result-card__listdate').attr('datetime'),
+                        seniority:jobPage('span.job-criteria__text.job-criteria__text--criteria').first().text()
+                    })
+                    resolve()
+                }
+                setTimeout(processPage,timeout*i);
+            });
+        }));
         return jobs
     }
 }
