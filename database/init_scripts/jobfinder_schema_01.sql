@@ -2,6 +2,7 @@ CREATE TABLE job (
     ID UUID PRIMARY KEY,
     title TEXT NOT NULL,
     seniority TEXT NOT NULL,
+    employment_type TEXT NOT NULL,
     url TEXT NOT NULL,
     location TEXT NOT NULL, 
     posting_date TIMESTAMPTZ NOT NULL,

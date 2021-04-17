@@ -42,9 +42,10 @@ class LinkedInScraper {
                     jobs.push({
                         title:$(e).find('h3.result-card__title.job-result-card__title').text(),
                         url:url,
-                        location:$(this).find('span.job-result-card__location').text(),
+                        location:$(e).find('span.job-result-card__location').text(),
                         posting_date:$(e).find('time.job-result-card__listdate--new,time.job-result-card__listdate').attr('datetime'),
-                        seniority:jobPage('span.job-criteria__text.job-criteria__text--criteria').first().text()
+                        seniority:jobPage('span.job-criteria__text.job-criteria__text--criteria').first().text(),
+                        employment_type:jobPage('span.job-criteria__text.job-criteria__text--criteria').eq(1).text()
                     })
                     resolve()
                 }
