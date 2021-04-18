@@ -40,7 +40,7 @@ class LinkedInScraper {
                     let url = $(e).find('a.result-card__full-card-link').attr('href'),
                         jobPage = await _this.getUrl(url);
                     jobs.push({
-                        title:$(e).find('h3.result-card__title.job-result-card__title').text(),//.filter(':not(.Senior, .senior)').text(),
+                        title:$(e).find('h3.result-card__title.job-result-card__title').text(),
                         url:url,
                         location:$(e).find('span.job-result-card__location').text(),
                         posting_date:$(e).find('time.job-result-card__listdate--new,time.job-result-card__listdate').attr('datetime'),
