@@ -4,6 +4,7 @@ const pgp = pgPromise();
 const uuid = require('uuid');
 
 
+
 class PostgresService {
     initDB(){              
         const initOptions = {
@@ -21,7 +22,11 @@ class PostgresService {
     }
    
     async getJobs() {
-        const query = 'SELECT * FROM job;';
+        const query = `SELECT * FROM job WHERE title NOT LIKE '%Senior%' 
+                    AND title NOT LIKE '%SENIOR%' 
+                    AND title NOT LIKE '%senior%' 
+                    AND title NOT LIKE '%Sr%'
+                    AND title NOT LIKE '%Lead%';`
         const values = [];
         return this.run(query,values);
     }
