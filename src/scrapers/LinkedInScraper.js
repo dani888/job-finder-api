@@ -6,20 +6,22 @@ class LinkedInScraper {
 
     }
     async getJobs(){
-        let paginationUrl = 'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search',
-            search = `?keywords=Web%2BDeveloper&location=Lexington%2C%2BMassachusetts%2C%2BUnited%2BStates&geoId=104181684&trk=public_jobs_jobs-search-bar_search-submit&f_E=2%2C3&f_SB2=2&f_PP=102380872%2C104180134%2C104597301&f_JT=F&sortBy=DD&position=1&pageNum=0`,
-            pagination = 0,
-            paginationStep = 25,
-            paginationQuery = '&start=',
-            resultJobs = [];
-        let $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
-        while ($('li.result-card.job-result-card').length) {
-            let newJobs = await this.parseJobs($)
-            resultJobs = resultJobs.concat(newJobs)
-            pagination += paginationStep
-            $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
-        }
-        return resultJobs
+        return new Promise(async (resolve, reject) => {
+            let paginationUrl = 'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search',
+                search = `?keywords=Web%2BDeveloper&location=Lexington%2C%2BMassachusetts%2C%2BUnited%2BStates&geoId=104181684&trk=public_jobs_jobs-search-bar_search-submit&f_E=2%2C3&f_SB2=2&f_PP=102380872%2C104180134%2C104597301&f_JT=F&sortBy=DD&position=1&pageNum=0`,
+                pagination = 0,
+                paginationStep = 25,
+                paginationQuery = '&start=',
+                resultJobs = [];
+            let $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
+            while ($('li.result-card.job-result-card').length) {
+                let newJobs = await this.parseJobs($)
+                resultJobs = resultJobs.concat(newJobs)
+                pagination += paginationStep
+                $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
+            }
+            resolve(resultJobs)
+        })
     }
     async getUrl(url){
         console.log(url);
@@ -33,7 +35,7 @@ class LinkedInScraper {
     async parseJobs($){
         let jobs = [],
             _this = this,
-            timeout = 500;
+            timeout = 1000;
         await Promise.all($('li.result-card.job-result-card').map((i,e)=>{
             return new Promise((resolve, reject) => {
                 async function processPage() {

@@ -2,9 +2,9 @@ const express = require('express')
 const app = express()
 const port = 8080
 const PostgresService = require('./services/PostgresService.js')
-const LinkedInScraper = require('./scrapers/LinkedInScraper.js')
+const ScraperService = require('./services/ScraperService.js')
 const pgservice = new PostgresService()
-const linkedinscraper = new LinkedInScraper()
+const scraperService = new ScraperService()
 
 app.use(function(req, res, next) {
   res.header("Access-Control-Allow-Origin", "http://localhost:3000"); // update to match the domain you will make the request from
@@ -18,9 +18,9 @@ app.get('/get-jobs', async (req, res) => {
 })
 
 app.get('/test-scraper', async (req, res) => {
-  let result = await linkedinscraper.getJobs()
-  await pgservice.saveJobs(result)
-  res.json(result);
+  let results = await scraperService.scrape()
+  results.map(async result=>await pgservice.saveJobs(result))
+  res.json(results.flat());
 })
 
 app.listen(port, () => {
