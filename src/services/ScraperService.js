@@ -1,5 +1,7 @@
 const LinkedInScraper = require('../scrapers/LinkedInScraper.js')
 const linkedinscraper = new LinkedInScraper()
+//const IndeedScraper = require('../scrapers/IndeedScraper.js')
+//const Indeedscraper = new IndeedScraper()
 
 class ScraperService {
     constructor(){

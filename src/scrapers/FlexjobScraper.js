@@ -1,24 +1,25 @@
 const cheerio = require('cheerio');
 const axios = require('axios');
 
-class IndeedScraper {
+class FlexjobScraper {
     constructor(){
 
     }
     async getJobs(){
         return new Promise(async (resolve, reject) => {
-            let paginationUrl = 'https://www.indeed.com/',
-                search = `jobs?q=web+developer+$60,000&l=Boston,+MA&jt=fulltime&explvl=entry_level`,
-                pagination = 0,
-                paginationStep = 10,
-                paginationQuery = '&start=',
+            let paginationUrl = 'https://www.flexjobs.com/',
+                search = `/search?jobtypes%5B%5D=Employee&location=Boston%2C+MA`,
+                searchtwo = '&schedule%5B%5D=Full-Time&search=web+developer&will_travel%5B%5D=No',
+                pagination = 1,
+                paginationStep = 1,
+                paginationQuery = '&page=',
                 resultJobs = [];
-            let $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
-            while ($('div.jobsearch-SerpJobCard').length) { 
+            let $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}${searchtwo}`)
+            while ($('li.list-group-item.job').length) { 
                 let newJobs = await this.parseJobs($)
                 resultJobs = resultJobs.concat(newJobs)
                 pagination += paginationStep
-                $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
+                $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}${searchtwo}`)
             }
             resolve(resultJobs)
         })
@@ -36,16 +37,16 @@ class IndeedScraper {
         let jobs = [],
             _this = this,
             timeout = 2000;
-        await Promise.all($('div.jobsearch-SerpJobCard').map((i,e)=>{
+        await Promise.all($('li.list-group-item.job').map((i,e)=>{
             return new Promise((resolve, reject) => {
                 async function processPage() {
-                    let url ="https://www.indeed.com" + $(e).find('h2 a.jobtitle.turnstileLink').attr('href'),
+                    let url ="https://www.flexjobs.com/" + $(e).find('a.job-link').attr('href'),
                         jobPage = await _this.getUrl(url);
                     jobs.push({
-                        title:$(e).find('h2 a.jobtitle.turnstileLink').attr('title'),
+                        title:$(e).find('div.col-12.col-lg-9').attr('h1'),
                         url:url,    
-                        location:$(e).find('div.recJobLoc').attr('data-rc-loc'),
-                        posting_date:$(e).find('span.date.date-a11y').text(),
+                        location:$(e).find('table.table.table-striped.table-sm mb-3 tbody tr td').eq(3),
+                        posting_date:$(e).find('table.table.table-striped.table-sm mb-3 tbody tr td').eq(1),
                         seniority:"Entry level",
                         employment_type:"Full Time"
                     })
@@ -58,4 +59,4 @@ class IndeedScraper {
     }
 }
 
-module.exports = IndeedScraper;
+module.exports = FlexjobScraper;
