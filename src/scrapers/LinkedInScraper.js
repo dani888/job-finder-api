@@ -35,7 +35,7 @@ class LinkedInScraper {
     async parseJobs($){
         let jobs = [],
             _this = this,
-            timeout = 2000;
+            timeout = 3000;
         await Promise.all($('li.result-card.job-result-card').map((i,e)=>{
             return new Promise((resolve, reject) => {
                 async function processPage() {

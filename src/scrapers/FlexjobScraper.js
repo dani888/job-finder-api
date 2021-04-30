@@ -7,19 +7,18 @@ class FlexjobScraper {
     }
     async getJobs(){
         return new Promise(async (resolve, reject) => {
-            let paginationUrl = 'https://www.flexjobs.com/',
-                search = `/search?jobtypes%5B%5D=Employee&location=Boston%2C+MA`,
-                searchtwo = '&schedule%5B%5D=Full-Time&search=web+developer&will_travel%5B%5D=No',
+            let paginationUrl = 'https://www.flexjobs.com/search',
+                search = `?career_level%5B%5D=Entry-Level&jobtypes%5B%5D=Employee&location=Boston%2C+MA&schedule%5B%5D=Full-Time&search=web+developer&will_travel%5B%5D=No`,
                 pagination = 1,
                 paginationStep = 1,
                 paginationQuery = '&page=',
                 resultJobs = [];
-            let $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}${searchtwo}`)
+            let $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
             while ($('li.list-group-item.job').length) { 
                 let newJobs = await this.parseJobs($)
                 resultJobs = resultJobs.concat(newJobs)
                 pagination += paginationStep
-                $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}${searchtwo}`)
+                $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
             }
             resolve(resultJobs)
         })
@@ -36,19 +35,19 @@ class FlexjobScraper {
     async parseJobs($){ 
         let jobs = [],
             _this = this,
-            timeout = 2000;
+            timeout = 3000;
         await Promise.all($('li.list-group-item.job').map((i,e)=>{
             return new Promise((resolve, reject) => {
                 async function processPage() {
-                    let url ="https://www.flexjobs.com/" + $(e).find('a.job-link').attr('href'),
+                    let url ="https://www.flexjobs.com" + $(e).find('a.job-link').attr('href'),
                         jobPage = await _this.getUrl(url);
                     jobs.push({
-                        title:$(e).find('div.col-12.col-lg-9').attr('h1'),
+                        title:jobPage('div.col-12.col-lg-9 h1').text(),
                         url:url,    
-                        location:$(e).find('table.table.table-striped.table-sm mb-3 tbody tr td').eq(3),
-                        posting_date:$(e).find('table.table.table-striped.table-sm mb-3 tbody tr td').eq(1),
-                        seniority:"Entry level",
-                        employment_type:"Full Time"
+                        location:jobPage('table.job-details tbody tr td').eq(2).children().remove().end().text(),
+                        posting_date:jobPage('table.job-details tbody tr td').eq(0).text(),
+                        seniority:jobPage('table.job-details tbody tr td').eq(5).text(),
+                        employment_type:jobPage('table.job-details tbody tr td').eq(4).text()
                     })
                     resolve()
                 }

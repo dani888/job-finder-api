@@ -35,7 +35,7 @@ class IndeedScraper {
     async parseJobs($){ 
         let jobs = [],
             _this = this,
-            timeout = 2000;
+            timeout = 3000;
         await Promise.all($('div.jobsearch-SerpJobCard').map((i,e)=>{
             return new Promise((resolve, reject) => {
                 async function processPage() {
