@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const axios = require('axios');
+const dayjs = require('dayjs');
 
 class LinkedInScraper {
     constructor(){
@@ -28,7 +29,7 @@ class LinkedInScraper {
         let headers = {
             'User-Agent':"Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36"
         }
-        let response = await axios.get(url,headers)
+        let response = await axios.get(url,{headers})
         const $ = cheerio.load(response.data);
         return $
     }
@@ -45,9 +46,9 @@ class LinkedInScraper {
                         title:$(e).find('h3.result-card__title.job-result-card__title').text(),
                         url:url,
                         location:$(e).find('span.job-result-card__location').text(),
-                        posting_date:$(e).find('time.job-result-card__listdate--new,time.job-result-card__listdate').attr('datetime'),
-                        seniority:jobPage('span.job-criteria__text.job-criteria__text--criteria').first().text(),
-                        employment_type:jobPage('span.job-criteria__text.job-criteria__text--criteria').eq(1).text()
+                        posting_date:dayjs($(e).find('time.job-result-card__listdate--new,time.job-result-card__listdate').attr('datetime')) || dayjs(),
+                        seniority:jobPage('span.job-criteria__text.job-criteria__text--criteria').first().text() || "not found",
+                        employment_type:jobPage('span.job-criteria__text.job-criteria__text--criteria').eq(1).text() || "not found"
                     })
                     resolve()
                 }

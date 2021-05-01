@@ -4,14 +4,14 @@ const IndeedScraper = require('../scrapers/IndeedScraper.js')
 const indeedScraper = new IndeedScraper()
 const FlexjobScraper = require('../scrapers/FlexjobScraper.js')
 const flexjobScraper = new FlexjobScraper()
-const LinkupScraper = require('../scrapers/LinkupScraper.js')
-const linkupScraper = new LinkupScraper()
+// const LinkupScraper = require('../scrapers/LinkupScraper.js')
+// const linkupScraper = new LinkupScraper()
 const GlassdoorScraper = require('../scrapers/GlassdoorScraper.js')
 const glassdoorScraper = new GlassdoorScraper()
 
 class ScraperService {
     constructor(){
-        this.scrapers = [glassdoorScraper]
+        this.scrapers = [linkedinscraper,indeedScraper]
     }
 
     async scrape(){
