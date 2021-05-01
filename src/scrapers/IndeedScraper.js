@@ -1,20 +1,20 @@
 const cheerio = require('cheerio');
 const axios = require('axios');
 
-class LinkedInScraper {
+class IndeedScraper {
     constructor(){
 
     }
     async getJobs(){
         return new Promise(async (resolve, reject) => {
-            let paginationUrl = 'https://www.linkedin.com/jobs-guest/jobs/api/seeMoreJobPostings/search',
-                search = `?keywords=Web%2BDeveloper&location=Lexington%2C%2BMassachusetts%2C%2BUnited%2BStates&geoId=104181684&trk=public_jobs_jobs-search-bar_search-submit&f_E=2%2C3&f_SB2=2&f_PP=102380872%2C104180134%2C104597301&f_JT=F&sortBy=DD&position=1&pageNum=0`,
+            let paginationUrl = 'https://www.indeed.com/',
+                search = `jobs?q=web+developer+$60,000&l=Boston,+MA&jt=fulltime&explvl=entry_level`,
                 pagination = 0,
-                paginationStep = 25,
+                paginationStep = 10,
                 paginationQuery = '&start=',
                 resultJobs = [];
             let $ = await this.getUrl(`${paginationUrl}${search}${paginationQuery}${pagination}`)
-            while ($('li.result-card.job-result-card').length) {
+            while ($('div.jobsearch-SerpJobCard').length) { 
                 let newJobs = await this.parseJobs($)
                 resultJobs = resultJobs.concat(newJobs)
                 pagination += paginationStep
@@ -32,22 +32,22 @@ class LinkedInScraper {
         const $ = cheerio.load(response.data);
         return $
     }
-    async parseJobs($){
+    async parseJobs($){ 
         let jobs = [],
             _this = this,
             timeout = 3000;
-        await Promise.all($('li.result-card.job-result-card').map((i,e)=>{
+        await Promise.all($('div.jobsearch-SerpJobCard').map((i,e)=>{
             return new Promise((resolve, reject) => {
                 async function processPage() {
-                    let url = $(e).find('a.result-card__full-card-link').attr('href'),
+                    let url ="https://www.indeed.com" + $(e).find('h2 a.jobtitle.turnstileLink').attr('href'),
                         jobPage = await _this.getUrl(url);
                     jobs.push({
-                        title:$(e).find('h3.result-card__title.job-result-card__title').text(),
-                        url:url,
-                        location:$(e).find('span.job-result-card__location').text(),
-                        posting_date:$(e).find('time.job-result-card__listdate--new,time.job-result-card__listdate').attr('datetime'),
-                        seniority:jobPage('span.job-criteria__text.job-criteria__text--criteria').first().text(),
-                        employment_type:jobPage('span.job-criteria__text.job-criteria__text--criteria').eq(1).text()
+                        title:$(e).find('h2 a.jobtitle.turnstileLink').attr('title'),
+                        url:url,    
+                        location:$(e).find('div.recJobLoc').attr('data-rc-loc'),
+                        posting_date:$(e).find('span.date.date-a11y').text(),
+                        seniority:"Entry level",
+                        employment_type:"Full Time"
                     })
                     resolve()
                 }
@@ -58,4 +58,4 @@ class LinkedInScraper {
     }
 }
 
-module.exports = LinkedInScraper;
+module.exports = IndeedScraper;
