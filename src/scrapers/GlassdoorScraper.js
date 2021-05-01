@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const axios = require('axios');
+const dayjs = require('dayjs');
 
 class GlassdoorScraper {
     constructor(){
@@ -46,7 +47,7 @@ class GlassdoorScraper {
                         title:jobPage('div.css-17x2pwl.e11nt52q6').text(),
                         url:url,    
                         location:$(e).find('span.pr-xxsm.css-1ndif2q.e1rrn5ka0').text(),
-                        posting_date:$(e).find('div.d-flex.align-items-end.pl-std.css-mi55ob').first().text(),
+                        posting_date:_this.parseDate($(e).find('div.d-flex.align-items-end.pl-std.css-mi55ob').first().text()) || dayjs(),
                         seniority:"Entry Level",
                         employment_type:jobPage('span.css-sr4ps0.e18tf5om4').first().text()
                     })
@@ -56,6 +57,23 @@ class GlassdoorScraper {
             });
         }));
         return jobs
+    }
+    parseDate(string){
+        let splitDate = string.split(" ")
+        // 23h
+        if(parseInt(string) !== NaN){
+            return dayjs().subtract(parseInt(string),"hour")
+        }
+        // "1 day ago"
+        // "30+ days ago"
+        if(splitDate && splitDate.length && parseInt(splitDate[0]) != NaN ){
+            return dayjs().subtract(parseInt(splitDate[0]),"days")
+        }
+        // "Active 30+ days ago"
+        if (parseInt(splitDate[1]) != NaN) {
+            return dayjs().subtract(parseInt(splitDate[1]),"days")
+        }
+        return dayjs()
     }
 }
 

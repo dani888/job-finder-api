@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const axios = require('axios');
+const dayjs = require('dayjs');
 
 class FlexjobScraper {
     constructor(){
@@ -28,7 +29,7 @@ class FlexjobScraper {
         let headers = {
             'User-Agent':"Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36"
         }
-        let response = await axios.get(url,headers)
+        let response = await axios.get(url,{headers})
         const $ = cheerio.load(response.data);
         return $
     }
@@ -45,7 +46,7 @@ class FlexjobScraper {
                         title:jobPage('div.col-12.col-lg-9 h1').text(),
                         url:url,    
                         location:jobPage('table.job-details tbody tr td').eq(2).children().remove().end().text(),
-                        posting_date:jobPage('table.job-details tbody tr td').eq(0).text(),
+                        posting_date:dayjs(jobPage('table.job-details tbody tr td').eq(0).text()) || dayjs(),
                         seniority:jobPage('table.job-details tbody tr td').eq(5).text(),
                         employment_type:jobPage('table.job-details tbody tr td').eq(4).text()
                     })

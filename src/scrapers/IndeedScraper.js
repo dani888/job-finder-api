@@ -8,8 +8,8 @@ class IndeedScraper {
     }
     async getJobs(){
         return new Promise(async (resolve, reject) => {
-            let paginationUrl = 'https://www.indeed.com/',
-                search = `jobs?q=web+developer+$60,000&l=Boston,+MA&jt=fulltime&explvl=entry_level`,
+            let paginationUrl = 'https://www.indeed.com/jobs',
+                search = `?q=web+developer+$60,000&l=Boston,+MA&jt=fulltime&explvl=entry_level`,
                 pagination = 0,
                 paginationStep = 10,
                 paginationQuery = '&start=',
