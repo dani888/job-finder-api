@@ -1,5 +1,6 @@
 const cheerio = require('cheerio');
 const axios = require('axios');
+const dayjs = require('dayjs');
 
 class IndeedScraper {
     constructor(){
@@ -28,7 +29,7 @@ class IndeedScraper {
         let headers = {
             'User-Agent':"Mozilla/5.0 (Windows NT 10.0) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/90.0.4430.72 Safari/537.36"
         }
-        let response = await axios.get(url,headers)
+        let response = await axios.get(url,{headers})
         const $ = cheerio.load(response.data);
         return $
     }
@@ -45,7 +46,7 @@ class IndeedScraper {
                         title:$(e).find('h2 a.jobtitle.turnstileLink').attr('title'),
                         url:url,    
                         location:$(e).find('div.recJobLoc').attr('data-rc-loc'),
-                        posting_date:$(e).find('span.date.date-a11y').text(),
+                        posting_date:_this.parseDate($(e).find('span.date.date-a11y').text()) || dayjs(),
                         seniority:"Entry level",
                         employment_type:"Full Time"
                     })
@@ -55,6 +56,23 @@ class IndeedScraper {
             });
         }));
         return jobs
+    }
+    parseDate(string){
+        // "Today"
+        if(string === "Today"){
+            return dayjs()
+        }
+        let splitDate = string.split(" ")
+        // "1 day ago"
+        // "30+ days ago"
+        if(splitDate && splitDate.length && parseInt(splitDate[0]) != NaN ){
+            return dayjs().subtract(parseInt(splitDate[0]),"days")
+        }
+        // "Active 1 day ago"
+        if (parseInt(splitDate[1]) != NaN) {
+            return dayjs().subtract(parseInt(splitDate[1]),"days")
+        }
+        return dayjs()
     }
 }
 
