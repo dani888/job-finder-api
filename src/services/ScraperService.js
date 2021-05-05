@@ -8,12 +8,12 @@ const flexjobScraper = new FlexjobScraper()
 // const linkupScraper = new LinkupScraper()
 const GlassdoorScraper = require('../scrapers/GlassdoorScraper.js')
 const glassdoorScraper = new GlassdoorScraper()
-const RoberHalfScraper = require('../scrapers/RoberHalfScraper.js')
-const roberHalfScraper = new RoberHalfScraper()
+// const RoberHalfScraper = require('../scrapers/RoberHalfScraper.js')
+// const roberHalfScraper = new RoberHalfScraper()
 
 class ScraperService {
     constructor(){
-        this.scrapers = [roberHalfScraper]
+        this.scrapers = [glassdoorScraper]
     }
 
     async scrape(){
