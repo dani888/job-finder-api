@@ -22,11 +22,29 @@ class PostgresService {
     }
    
     async getJobs() {
-        const query = `SELECT * FROM job WHERE title NOT LIKE '%Senior%' 
-                    AND title NOT LIKE '%SENIOR%' 
-                    AND title NOT LIKE '%senior%' 
-                    AND title NOT LIKE '%Sr%'
-                    AND title NOT LIKE '%Lead%';`
+        const query = `
+        SELECT 
+            j.*,
+            case when a.id != NULL then 'TRUE' else 'FALSE' end as appied,
+            case when l.id != NULL then 'TRUE' else 'FALSE' end as liked,
+            case when p.id != NULL then 'TRUE' else 'FALSE' end as passed
+        FROM job j
+        LEFT JOIN applied a
+            ON a.job_id = j.id
+        LEFT JOIN liked l
+            ON l.job_id = j.id
+        LEFT JOIN passed p
+            ON p.job_id = j.id
+        WHERE 
+            j.title NOT LIKE '%Senior%' 
+        AND 
+            j.title NOT LIKE '%SENIOR%' 
+        AND 
+            j.title NOT LIKE '%senior%' 
+        AND 
+            j.title NOT LIKE '%Sr%'
+        AND 
+            j.title NOT LIKE '%Lead%';`
         const values = [];
         return this.run(query,values);
     }
