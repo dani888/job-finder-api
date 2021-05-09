@@ -25,7 +25,7 @@ class PostgresService {
         const query = `
         SELECT 
             j.*,
-            case when a.id IS NOT NULL then 'TRUE' else 'FALSE' end as appied,
+            case when a.id IS NOT NULL then 'TRUE' else 'FALSE' end as applied,
             case when l.id IS NOT NULL then 'TRUE' else 'FALSE' end as liked,
             case when p.id IS NOT NULL then 'TRUE' else 'FALSE' end as passed
         FROM job j
