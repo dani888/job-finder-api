@@ -17,6 +17,16 @@ app.get('/get-jobs', async (req, res) => {
   res.json(result);
 })
 
+app.get('/update-tag', async (req, res) => {
+  let { tag, isSelected, jobId } = req.query
+  if (isSelected == 'true') {
+    await pgservice.createTag(jobId, tag)
+  } else {
+    await pgservice.deleteTag(jobId, tag)
+  }
+  res.json({success:true});
+})
+
 app.get('/test-scraper', async (req, res) => {
   let results = await scraperService.scrape()
   results.map(async result=>await pgservice.saveJobs(result))

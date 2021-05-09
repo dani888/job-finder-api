@@ -25,9 +25,9 @@ class PostgresService {
         const query = `
         SELECT 
             j.*,
-            case when a.id != NULL then 'TRUE' else 'FALSE' end as appied,
-            case when l.id != NULL then 'TRUE' else 'FALSE' end as liked,
-            case when p.id != NULL then 'TRUE' else 'FALSE' end as passed
+            case when a.id IS NOT NULL then 'TRUE' else 'FALSE' end as appied,
+            case when l.id IS NOT NULL then 'TRUE' else 'FALSE' end as liked,
+            case when p.id IS NOT NULL then 'TRUE' else 'FALSE' end as passed
         FROM job j
         LEFT JOIN applied a
             ON a.job_id = j.id
@@ -46,6 +46,26 @@ class PostgresService {
         AND 
             j.title NOT LIKE '%Lead%';`
         const values = [];
+        return this.run(query,values);
+    }
+
+    async createTag(jobId, table){
+        const id = uuid.v1();
+        const query = `
+        INSERT INTO ${table}
+            (ID, job_id)
+        VALUES
+            ($1,$2)
+        ON CONFLICT DO NOTHING;`
+        const values = [id, jobId];
+        return this.run(query,values);
+    }
+    async deleteTag(jobId, table){
+        const query = `
+        DELETE FROM ${table}
+        WHERE
+            job_id = $1;`
+        const values = [jobId];
         return this.run(query,values);
     }
    
